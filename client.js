@@ -60,7 +60,7 @@ ChatBox.newClient = {
         this.handleCommand = function (command, socket) {
             var client = getClientBySocket(socket);
 
-            if (command.substring(0, 1) != '/') { //check is command
+            if (command.substring(0, 1) != '/') {
                 return false;
             }
 
