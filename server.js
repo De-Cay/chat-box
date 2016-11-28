@@ -26,8 +26,9 @@ ChatBox.newServer = {
 
                 if(message.indexOf('$') !== -1){
                     message = message.substring(1, message.length);
-                    remote.write("Your user name: " + message+"\n");
-                    newClient.addClient(remote, message);
+                    if(newClient.addClient(remote, message)){
+                        remote.write("Your user name: " + message+"\n");
+                    }
                 }
 
                 console.log(message);

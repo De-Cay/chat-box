@@ -7,7 +7,7 @@ ChatBox.newClient = {
 
         var clients = [];
 
-        var clientCreate = function (socket, name) {
+        var createClient = function (socket, name) {
             var me = this;
             me.send = function(message) {
                 me.socket.write(message + '\n');
@@ -21,9 +21,9 @@ ChatBox.newClient = {
             me.name = name;
             var users = 'Users: ' + clients.join(', ');
             if(clients.length > 0){
-                me.send("Here are some users to chat" + users+" \nFor chat use '/msg userName <message>' ");
+                me.send("Here are some users to chat" + users+" \nFor chat use '/<userName> <message>' ");
             }else {
-                me.send("Looks like no one is here. \nFor chat use '/msg userName <message>' ");
+                me.send("Looks like no one is here. \nFor chat use '/<userName> <message>' ");
             }
 
         };
@@ -44,45 +44,52 @@ ChatBox.newClient = {
             }
         };
 
+        var isUserExist = function (name) {
+            for (let ii = 0, n = clients.length; ii < n; ii++) {
+                if (clients[ii].name == name) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
         this.sendToAll = function (message) {
             for (let ii = 0, n = clients.length; ii < n; ii++) {
                 clients[ii].send(message);
             }
         };
 
+
         this.addClient = function (socket, name) {
-            this.sendToAll(name +' logged in.\n');
-            var client = new clientCreate(socket, name);
-            clients.push(client);
-            return client;
+            if(isUserExist(name)){
+                socket.write("This user already exist. Choose other name\n");
+                return false;
+            }else {
+                this.sendToAll(name +' logged in.\n');
+                var client = new createClient(socket, name);
+                clients.push(client);
+                return client;
+            }
         };
 
-        this.handleCommand = function (command, socket) {
-            var client = getClientBySocket(socket);
+        this.handleCommand = function (data, socket) {
+            var sender = getClientBySocket(socket);
 
-            if (command.substring(0, 1) != '/') {
+            if (data.substring(0, 1) != '/') {
                 return false;
             }
 
-            command = command.split(' ');
-            var type = command[0];
-            var value = command.length > 1 ? command[1] : null;
+            var index = data.indexOf(" ");
+            var name = data.substring(1, index);
+            var message = data.substring(index+1, data.length);
 
-            switch (type) {
-
-                case '/msg':
-                    var cmdClient = getClientByname(value);
-
-                    if (!cmdClient) {
-                        client.send('User not found!');
-                        return;
-                    }
-
-                    var message = command.splice(2, command.length).join(' ');
-                    cmdClient.send(client + ' says ' + message);
-
-                break;
+            var receiver = getClientByname(name);
+            if (!receiver) {
+                sender.send('User not found!');
+                return;
             }
+            receiver.send(sender + ' says: ' + message);
+
             return true;
         };
     }
