@@ -20,10 +20,10 @@ ChatBox.newClient = {
             me.socket = socket;
             me.name = name;
             var users = 'Users: ' + clients.join(', ');
-            if(clients.length < 0){
-                me.send("Here are some users to chat" + users);
+            if(clients.length > 0){
+                me.send("Here are some users to chat" + users+" \nFor chat use '/msg userName <message>' ");
             }else {
-                me.send("Looks like no one is here");
+                me.send("Looks like no one is here. \nFor chat use '/msg userName <message>' ");
             }
 
         };
@@ -70,7 +70,7 @@ ChatBox.newClient = {
 
             switch (type) {
 
-                case '/private':
+                case '/msg':
                     var cmdClient = getClientByname(value);
 
                     if (!cmdClient) {
@@ -81,11 +81,6 @@ ChatBox.newClient = {
                     var message = command.splice(2, command.length).join(' ');
                     cmdClient.send(client + ' says ' + message);
 
-                break;
-
-                case '/users':
-                    var users = 'Users: ' + clients.join(', ');
-                    client.send(users);
                 break;
             }
             return true;
