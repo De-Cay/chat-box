@@ -9,6 +9,11 @@ ChatBox.newClient = {
 
         var createClient = function (socket, name) {
             var me = this;
+
+            me.socket = socket;
+
+            me.name = name;
+
             me.send = function(message) {
                 me.socket.write(message + '\n');
             };
@@ -17,8 +22,6 @@ ChatBox.newClient = {
                 return me.name;
             };
 
-            me.socket = socket;
-            me.name = name;
             var users = 'Users: ' + clients.join(', ');
             if(clients.length > 0){
                 me.send("Here are some users to chat" + users+" \nFor chat use '/<userName> <message>' ");
@@ -53,7 +56,7 @@ ChatBox.newClient = {
             return false;
         };
 
-        this.sendToAll = function (message) {
+        var sendToAll = function (message) {
             for (let ii = 0, n = clients.length; ii < n; ii++) {
                 clients[ii].send(message);
             }
@@ -65,7 +68,7 @@ ChatBox.newClient = {
                 socket.write("This user already exist. Choose other name\n");
                 return false;
             }else {
-                this.sendToAll(name +' logged in.\n');
+                sendToAll(name +' logged in.\n');
                 var client = new createClient(socket, name);
                 clients.push(client);
                 return client;
