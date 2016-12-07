@@ -18,6 +18,7 @@ ChatBox.newClient = {
                 me.socket.write(message + '\n');
             };
 
+            // To print the users name
             me.toString = function() {
                 return me.name;
             };
